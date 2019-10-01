@@ -59,7 +59,7 @@ class RedisTest extends Unit
             $this->markTestSkipped('Predis is not installed');
         }
         /** @var ModuleContainer $container */
-        $container = make_container();
+        $container = \Codeception\Util\Stub::make('Codeception\Lib\ModuleContainer');;
 
         try {
             $this->module = new Redis($container);
