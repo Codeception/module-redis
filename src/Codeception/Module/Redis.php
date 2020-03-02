@@ -128,6 +128,7 @@ class Redis extends CodeceptionModule implements RequiresPackage
     public function cleanup()
     {
         try {
+            $this->debugSection('Redis', 'Performing cleanup');
             $this->driver->flushdb();
         } catch (\Exception $e) {
             throw new ModuleException(
