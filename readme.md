@@ -1,6 +1,6 @@
 # Redis module for Codeception
 
-[![Build Status](https://travis-ci.org/Codeception/module-redis.svg?branch=master)](https://travis-ci.org/Codeception/module-redis)
+![Build Status](https://github.com/Codeception/module-redis/workflows/CI/badge.svg)
 
 ## Installation
 
