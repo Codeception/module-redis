@@ -83,11 +83,18 @@ class Redis extends CodeceptionModule implements RequiresPackage
     public function _initialize()
     {
         try {
-            $this->driver = new RedisDriver([
+            $parameters = [
                 'host'     => $this->config['host'],
                 'port'     => $this->config['port'],
-                'database' => $this->config['database']
-            ]);
+                'database' => $this->config['database'],
+
+            ];
+
+            if (!empty($this->config['password'])) {
+                $parameters['password'] = $this->config['password'];
+            }
+
+            $this->driver = new RedisDriver($parameters);
         } catch (\Exception $e) {
             throw new ModuleException(
                 __CLASS__,
