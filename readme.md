@@ -1,13 +1,24 @@
-# Redis module for Codeception
+# Codeception Module Redis
 
-![Build Status](https://github.com/Codeception/module-redis/workflows/CI/badge.svg)
+Redis module for Codeception
+
+[![Actions Status](https://github.com/Codeception/module-redis/workflows/CI/badge.svg)](https://github.com/Codeception/module-redis/actions)
+[![Latest Stable Version](https://poser.pugx.org/codeception/module-redis/v/stable)](https://github.com/Codeception/module-redis/releases)
+[![Total Downloads](https://poser.pugx.org/codeception/module-redis/downloads)](https://packagist.org/packages/codeception/module-redis)
+[![License](https://poser.pugx.org/codeception/module-redis/license)](/LICENSE)
 
 ## Installation
 
 ```
-composer require --dev "codeception/module-redis"
+composer require "codeception/module-redis" --dev
 ```
 
 ## Documentation
 
-[Module documentation](https://codeception.com/docs/modules/Redis)
+See [the module documentation](https://codeception.com/docs/modules/Redis).
+
+## License
+
+`Codeception Module Redis` is open-sourced software licensed under the [MIT](/LICENSE) License.
+
+© Codeception PHP Testing Framework
