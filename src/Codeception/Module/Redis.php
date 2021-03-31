@@ -21,10 +21,14 @@ use Predis\Client as RedisDriver;
  * * **`host`** (`string`, default `'127.0.0.1'`) - The Redis host
  * * **`port`** (`int`, default `6379`) - The Redis port
  * * **`database`** (`int`, no default) - The Redis database. Needs to be specified.
+ * * **`username`** (`string`, no default) - When ACLs are enabled on Redis >= 6.0, both username and password are required for user authentication.
+ * * **`password`** (`string`, no default) - The Redis password/secret.
  * * **`cleanupBefore`**: (`string`, default `'never'`) - Whether/when to flush the database:
  *     * `suite`: at the beginning of every suite
  *     * `test`: at the beginning of every test
  *     * Any other value: never
+ *
+ * Note: The full configuration list can be found on Predis' github.
  *
  * ### Example (`unit.suite.yml`)
  *
@@ -83,11 +87,7 @@ class Redis extends CodeceptionModule implements RequiresPackage
     public function _initialize()
     {
         try {
-            $this->driver = new RedisDriver([
-                'host'     => $this->config['host'],
-                'port'     => $this->config['port'],
-                'database' => $this->config['database']
-            ]);
+            $this->driver = new RedisDriver($this->config);
         } catch (\Exception $e) {
             throw new ModuleException(
                 __CLASS__,
