@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
+use Codeception\Exception\ModuleException;
 use Codeception\Lib\ModuleContainer;
 use Codeception\Module\Redis;
 use Codeception\Test\Unit;
+use Codeception\Util\Stub;
 
-class RedisTest extends Unit
+final class RedisTest extends Unit
 {
     /**
      * @var array
@@ -48,18 +52,16 @@ class RedisTest extends Unit
 
 
     /**
-     * {@inheritdoc}
-     *
      * Every time a test starts, cleanup the database and populates it with some
      * dummy data.
      */
     protected function _setUp()
     {
-        if (!class_exists('Predis\Client')) {
+        if (!class_exists(\Predis\Client::class)) {
             $this->markTestSkipped('Predis is not installed');
         }
         /** @var ModuleContainer $container */
-        $container = \Codeception\Util\Stub::make('Codeception\Lib\ModuleContainer');;
+        $container = Stub::make(ModuleContainer::class);
 
         try {
             $this->module = new Redis($container);
@@ -94,7 +96,7 @@ class RedisTest extends Unit
     protected function shouldFail($exceptionClass = null)
     {
         if (!$exceptionClass) {
-            $exceptionClass = 'PHPUnit\Framework\AssertionFailedError';
+            $exceptionClass = \PHPUnit\Framework\AssertionFailedError::class;
         }
 
         $this->expectException($exceptionClass);
@@ -106,7 +108,7 @@ class RedisTest extends Unit
 
     public function testGrabFromRedisNonExistingKey()
     {
-        $this->shouldFail('\Codeception\Exception\ModuleException');
+        $this->shouldFail(ModuleException::class);
         $this->module->grabFromRedis('doesnotexist');
     }
 
@@ -182,7 +184,7 @@ class RedisTest extends Unit
 
     public function testGrabFromRedisZSetWithTwoArguments()
     {
-        $this->shouldFail('\Codeception\Exception\ModuleException');
+        $this->shouldFail(ModuleException::class);
         $this->module->grabFromRedis(
             self::$keys['zset']['name'],
             1
@@ -454,7 +456,7 @@ class RedisTest extends Unit
 
     public function testHaveInRedisZSetScalar()
     {
-        $this->shouldFail('\Codeception\Exception\ModuleException');
+        $this->shouldFail(ModuleException::class);
         $this->module->haveInRedis(
             'zset',
             'test:zset-create-array',
@@ -533,7 +535,7 @@ class RedisTest extends Unit
 
     public function testHaveInRedisHashScalar()
     {
-        $this->shouldFail('\Codeception\Exception\ModuleException');
+        $this->shouldFail(ModuleException::class);
         $this->module->haveInRedis(
             'hash',
             'test:hash-create-array',
@@ -765,7 +767,7 @@ class RedisTest extends Unit
 
     public function testDontSeeRedisKeyContainsNonExistingKey()
     {
-        $this->shouldFail('\Codeception\Exception\ModuleException');
+        $this->shouldFail(ModuleException::class);
         $this->module->dontSeeRedisKeyContains('doesnotexist', 'doesnotexist');
     }
 
@@ -775,7 +777,7 @@ class RedisTest extends Unit
 
     public function testDontSeeRedisKeyContainsWithArrayArgs()
     {
-        $this->shouldFail('\Codeception\Exception\ModuleException');
+        $this->shouldFail(ModuleException::class);
         $this->module->dontSeeRedisKeyContains(
             self::$keys['hash']['name'],
             self::$keys['hash']['value']
@@ -1137,7 +1139,7 @@ class RedisTest extends Unit
 
     public function testSeeRedisKeyContainsNonExistingKey()
     {
-        $this->shouldFail('\Codeception\Exception\ModuleException');
+        $this->shouldFail(ModuleException::class);
         $this->module->seeRedisKeyContains('doesnotexist', 'doesnotexist');
     }
 
@@ -1147,7 +1149,7 @@ class RedisTest extends Unit
 
     public function testSeeRedisKeyContainsWithArrayArgs()
     {
-        $this->shouldFail('\Codeception\Exception\ModuleException');
+        $this->shouldFail(ModuleException::class);
         $this->module->dontSeeRedisKeyContains(
             self::$keys['hash']['name'],
             self::$keys['hash']['value']
@@ -1348,7 +1350,6 @@ class RedisTest extends Unit
     // *******************************
     // Helper methods
     // *******************************
-
     /**
      * Explicitely cast the scores of a Zset associative array as float/double
      *
@@ -1356,7 +1357,7 @@ class RedisTest extends Unit
      *
      * @return array
      */
-    private function scoresToFloat(array $arr)
+    private function scoresToFloat(array $arr): array
     {
         foreach ($arr as $member => $score) {
             $arr[$member] = (float) $score;
