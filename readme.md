@@ -7,6 +7,10 @@ Redis module for Codeception
 [![Total Downloads](https://poser.pugx.org/codeception/module-redis/downloads)](https://packagist.org/packages/codeception/module-redis)
 [![License](https://poser.pugx.org/codeception/module-redis/license)](/LICENSE)
 
+## Requirements
+
+* `PHP 7.1` or higher.
+
 ## Installation
 
 ```
