@@ -15,9 +15,9 @@
 	],
 	"minimum-stability": "RC",
 	"require": {
-		"php": "^7.1 || ^8.0",
-		"codeception/codeception": "^4.0",
-		"predis/predis": "^1.0"
+		"php": "^7.3 || ^8.0",
+		"codeception/codeception": "^5.0 || *@dev",
+		"predis/predis": "^1.1"
 	},
 	"autoload": {
 		"classmap": [

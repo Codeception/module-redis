@@ -568,7 +568,7 @@ class Redis extends Module implements RequiresPackage
         switch ($this->driver->type($key)) {
             case 'string':
                 $reply = $this->driver->get($key);
-                $result = strpos($reply, $item) !== false;
+                $result = strpos($reply, (string) $item) !== false;
                 break;
 
             case 'list':
