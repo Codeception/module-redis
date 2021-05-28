@@ -6,7 +6,7 @@ use Codeception\Exception\ModuleException;
 use Codeception\Lib\ModuleContainer;
 use Codeception\Module\Redis;
 use Codeception\Test\Unit;
-use Codeception\Util\Stub;
+use Codeception\Stub;
 
 final class RedisTest extends Unit
 {
