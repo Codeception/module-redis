@@ -81,7 +81,7 @@ class Redis extends Module implements RequiresPackage
      */
     public $driver;
 
-    public function _requires()
+    public function _requires(): array
     {
         return [\Predis\Client::class => '"predis/predis": "^1.0"'];
     }
@@ -204,8 +204,8 @@ class Redis extends Module implements RequiresPackage
                 } else {
                     $reply = $this->driver->lrange(
                         $key,
-                        isset($args[1]) ? $args[1] : 0,
-                        isset($args[2]) ? $args[2] : -1
+                        $args[1] ?? 0,
+                        $args[2] ?? -1
                     );
                 }
                 break;
@@ -224,7 +224,7 @@ class Redis extends Module implements RequiresPackage
                 $reply = $this->driver->zrange(
                     $key,
                     isset($args[2]) ? $args[1] : 0,
-                    isset($args[2]) ? $args[2] : -1,
+                    $args[2] ?? -1,
                     'WITHSCORES'
                 );
                 break;
