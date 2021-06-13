@@ -21,6 +21,8 @@ composer require "codeception/module-redis" --dev
 
 See [the module documentation](https://codeception.com/docs/modules/Redis).
 
+[Changelog](https://github.com/Codeception/module-redis/releases)
+
 ## License
 
 `Codeception Module Redis` is open-sourced software licensed under the [MIT](/LICENSE) License.
