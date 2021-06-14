@@ -133,6 +133,7 @@ class Redis extends Module implements RequiresPackage
     public function cleanup(): void
     {
         try {
+            $this->debugSection('Redis', 'Performing cleanup');
             $this->driver->flushdb();
         } catch (Exception $e) {
             throw new ModuleException(
