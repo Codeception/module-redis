@@ -76,12 +76,10 @@ class Redis extends Module implements RequiresPackage
 
     /**
      * The Redis driver
-     *
-     * @var RedisDriver
      */
-    public $driver;
+    public ?RedisDriver $driver = null;
 
-    public function _requires()
+    public function _requires(): array
     {
         return [\Predis\Client::class => '"predis/predis": "^1.0"'];
     }
@@ -95,10 +93,10 @@ class Redis extends Module implements RequiresPackage
     {
         try {
             $this->driver = new RedisDriver($this->config);
-        } catch (Exception $e) {
+        } catch (Exception $exception) {
             throw new ModuleException(
                 __CLASS__,
-                $e->getMessage()
+                $exception->getMessage()
             );
         }
     }
@@ -205,10 +203,11 @@ class Redis extends Module implements RequiresPackage
                 } else {
                     $reply = $this->driver->lrange(
                         $key,
-                        isset($args[1]) ? $args[1] : 0,
-                        isset($args[2]) ? $args[2] : -1
+                        $args[1] ?? 0,
+                        $args[2] ?? -1
                     );
                 }
+
                 break;
 
             case 'set':
@@ -222,10 +221,11 @@ class Redis extends Module implements RequiresPackage
                         'The method grabFromRedis(), when used with sorted sets, expects either one argument or three'
                     );
                 }
+
                 $reply = $this->driver->zrange(
                     $key,
                     isset($args[2]) ? $args[1] : 0,
-                    isset($args[2]) ? $args[2] : -1,
+                    $args[2] ?? -1,
                     'WITHSCORES'
                 );
                 break;
@@ -287,6 +287,7 @@ class Redis extends Module implements RequiresPackage
                         'If second argument of haveInRedis() method is "string", third argument must be a scalar'
                     );
                 }
+
                 $this->driver->set($key, $value);
                 break;
 
@@ -305,6 +306,7 @@ class Redis extends Module implements RequiresPackage
                         'If second argument of haveInRedis() method is "zset", third argument must be an (associative) array'
                     );
                 }
+
                 $this->driver->zadd($key, $value);
                 break;
 
@@ -315,6 +317,7 @@ class Redis extends Module implements RequiresPackage
                         'If second argument of haveInRedis() method is "hash", third argument must be an array'
                     );
                 }
+
                 $this->driver->hmset($key, $value);
                 break;
 
@@ -467,7 +470,6 @@ class Redis extends Module implements RequiresPackage
      * ```
      *
      * @param string $command The command name
-     *
      * @return mixed
      */
     public function sendCommandToRedis(string $command)
@@ -528,7 +530,6 @@ class Redis extends Module implements RequiresPackage
      * Converts boolean values to "0" and "1"
      *
      * @param mixed $var The variable
-     *
      * @return mixed
      */
     private function boolToString($var)
@@ -569,7 +570,7 @@ class Redis extends Module implements RequiresPackage
         switch ($this->driver->type($key)) {
             case 'string':
                 $reply = $this->driver->get($key);
-                $result = strpos($reply, $item) !== false;
+                $result = strpos($reply, (string) $item) !== false;
                 break;
 
             case 'list':
@@ -591,6 +592,7 @@ class Redis extends Module implements RequiresPackage
                 } else {
                     $result = true;
                 }
+
                 break;
 
             case 'hash':
