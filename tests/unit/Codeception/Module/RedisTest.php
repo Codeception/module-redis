@@ -6,28 +6,21 @@ use Codeception\Exception\ModuleException;
 use Codeception\Lib\ModuleContainer;
 use Codeception\Module\Redis;
 use Codeception\Test\Unit;
-use Codeception\Util\Stub;
+use Codeception\Stub;
+use PHPUnit\Framework\AssertionFailedError;
 
 final class RedisTest extends Unit
 {
-    /**
-     * @var array
-     */
-    protected static $config = [
+    protected static array $config = [
         'database' => 15
     ];
 
-    /**
-     * @var Redis
-     */
-    protected $module;
+    protected ?Redis $module = null;
 
     /**
      * Keys that will be created for the tests
-     *
-     * @var array
      */
-    protected static $keys = [
+    protected static array $keys = [
         'string' => [
             'name' => 'test:string',
             'value' => 'hello'
@@ -60,6 +53,7 @@ final class RedisTest extends Unit
         if (!class_exists(\Predis\Client::class)) {
             $this->markTestSkipped('Predis is not installed');
         }
+
         /** @var ModuleContainer $container */
         $container = Stub::make(ModuleContainer::class);
 
@@ -69,8 +63,8 @@ final class RedisTest extends Unit
             $this->module->_initialize();
 
             $this->module->driver->flushDb();
-        } catch (Predis\Connection\ConnectionException $e) {
-            $this->markTestSkipped($e->getMessage());
+        } catch (Predis\Connection\ConnectionException $exception) {
+            $this->markTestSkipped($exception->getMessage());
         }
 
         $addMethods = [
@@ -96,7 +90,7 @@ final class RedisTest extends Unit
     protected function shouldFail($exceptionClass = null)
     {
         if (!$exceptionClass) {
-            $exceptionClass = \PHPUnit\Framework\AssertionFailedError::class;
+            $exceptionClass = AssertionFailedError::class;
         }
 
         $this->expectException($exceptionClass);
@@ -1354,8 +1348,6 @@ final class RedisTest extends Unit
      * Explicitely cast the scores of a Zset associative array as float/double
      *
      * @param array $arr The ZSet associative array
-     *
-     * @return array
      */
     private function scoresToFloat(array $arr): array
     {
