@@ -956,12 +956,15 @@ final class RedisTest extends Unit
     public function testSeeInRedisNonExistingKeyWithoutValue()
     {
         $this->shouldFail();
+        $this->expectExceptionMessage('Cannot find key "doesnotexist"');
         $this->module->seeInRedis('doesnotexist');
     }
 
     public function testSeeInRedisNonExistingKeyWithValue()
     {
         $this->shouldFail();
+        $this->expectExceptionMessageMatches('/^Cannot find key "doesnotexist"' .
+            "\n" . 'Failed asserting that false is true.$/');
         $this->module->seeInRedis(
             'doesnotexist',
             'some value'
@@ -994,6 +997,7 @@ final class RedisTest extends Unit
     public function testSeeInRedisExistingStringWithIncorrectValue()
     {
         $this->shouldFail();
+        $this->expectExceptionMessage('Value of key "test:string" does not match expected value');
         $this->module->seeInRedis(
             self::$keys['string']['name'],
             'incorrect value'
@@ -1024,6 +1028,7 @@ final class RedisTest extends Unit
     public function testSeeInRedisExistingListWithIncorrectValue()
     {
         $this->shouldFail();
+        $this->expectExceptionMessage('Value of key "test:list" does not match expected value');
         $this->module->seeInRedis(
             self::$keys['list']['name'],
             ['incorrect', 'value']
@@ -1053,6 +1058,7 @@ final class RedisTest extends Unit
     public function testSeeInRedisExistingSetWithIncorrectValue()
     {
         $this->shouldFail();
+        $this->expectExceptionMessage('Value of key "test:set" does not match expected value');
         $this->module->seeInRedis(
             self::$keys['set']['name'],
             ['incorrect', 'value']
@@ -1092,6 +1098,7 @@ final class RedisTest extends Unit
     public function testSeeInRedisExistingZSetWithIncorrectValue()
     {
         $this->shouldFail();
+        $this->expectExceptionMessage('Value of key "test:zset" does not match expected value');
         $this->module->seeInRedis(
             self::$keys['zset']['name'],
             ['incorrect' => 1, 'value' => 2]
@@ -1121,6 +1128,7 @@ final class RedisTest extends Unit
     public function testSeeInRedisExistingHashWithIncorrectValue()
     {
         $this->shouldFail();
+        $this->expectExceptionMessage('Value of key "test:hash" does not match expected value');
         $this->module->seeInRedis(
             self::$keys['hash']['name'],
             ['incorrect' => 'value']

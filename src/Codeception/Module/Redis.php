@@ -9,7 +9,10 @@ use Codeception\Module;
 use Codeception\Exception\ModuleException;
 use Codeception\TestInterface;
 use Exception;
+use PHPUnit\Framework\ExpectationFailedException;
 use Predis\Client as RedisDriver;
+use SebastianBergmann\Comparator\ComparisonFailure;
+use SebastianBergmann\Comparator\Factory as ComparatorFactory;
 
 /**
  * This module uses the [Predis](https://github.com/nrk/predis) library
@@ -364,7 +367,7 @@ class Redis extends Module implements RequiresPackage
     public function dontSeeInRedis(string $key, $value = null): void
     {
         $this->assertFalse(
-            $this->checkKeyExists($key, $value),
+            $this->checkKeyExists($key, $value, false),
             sprintf('The key "%s" exists', $key) . ($value ? ' and its value matches the one provided' : '')
         );
     }
@@ -448,8 +451,8 @@ class Redis extends Module implements RequiresPackage
     public function seeInRedis(string $key, $value = null): void
     {
         $this->assertTrue(
-            $this->checkKeyExists($key, $value),
-            sprintf('Cannot find key "%s"', $key) . ($value ? ' with the provided value' : '')
+            $this->checkKeyExists($key, $value, true),
+            sprintf('Cannot find key "%s"', $key)
         );
     }
 
@@ -620,12 +623,16 @@ class Redis extends Module implements RequiresPackage
      * @param mixed  $value Optional. If specified, also checks the key has this
      * value. Booleans will be converted to 1 and 0 (even inside arrays)
      */
-    private function checkKeyExists(string $key, $value = null): bool
+    private function checkKeyExists(string $key, $value, bool $throwException = false): bool
     {
         $type = $this->driver->type($key);
 
+        if ($type == 'none') {
+            return false;
+        }
+
         if (is_null($value)) {
-            return $type != 'none';
+            return true;
         }
 
         $value = $this->boolToString($value);
@@ -666,7 +673,23 @@ class Redis extends Module implements RequiresPackage
                 break;
 
             default:
-                $result = false;
+                throw new ModuleException(
+                    $this,
+                    sprintf("Unexpected value type %s", $type)
+                );
+        }
+
+        if ($throwException && !$result) {
+            $comparatorFactory = new ComparatorFactory();
+            $comparator = $comparatorFactory->getComparatorFor($value, $reply);
+            try {
+                $comparator->assertEquals($value, $reply);
+            } catch (ComparisonFailure $failure) {
+                throw new ExpectationFailedException(
+                    sprintf("Value of key \"%s\" does not match expected value", $key),
+                    $failure
+                );
+            }
         }
 
         return $result;
