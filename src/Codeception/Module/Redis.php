@@ -366,10 +366,15 @@ class Redis extends Module implements RequiresPackage
      */
     public function dontSeeInRedis(string $key, $value = null): void
     {
-        $this->assertFalse(
-            $this->checkKeyExists($key, $value, false),
-            sprintf('The key "%s" exists', $key) . ($value ? ' and its value matches the one provided' : '')
-        );
+        try {
+            $this->assertFalse(
+                $this->checkKeyExists($key, $value),
+                sprintf('The key "%s" exists', $key) . ($value ? ' and its value matches the one provided' : '')
+            );
+        } catch (ComparisonFailure $failure) {
+            // values are different
+            $this->assertFalse(false);
+        }
     }
 
     /**
@@ -450,10 +455,17 @@ class Redis extends Module implements RequiresPackage
      */
     public function seeInRedis(string $key, $value = null): void
     {
-        $this->assertTrue(
-            $this->checkKeyExists($key, $value, true),
-            sprintf('Cannot find key "%s"', $key)
-        );
+        try {
+            $this->assertTrue(
+                $this->checkKeyExists($key, $value),
+                sprintf('Cannot find key "%s"', $key)
+            );
+        } catch (ComparisonFailure $failure) {
+            throw new ExpectationFailedException(
+                sprintf("Value of key \"%s\" does not match expected value", $key),
+                $failure
+            );
+        }
     }
 
     /**
@@ -623,7 +635,7 @@ class Redis extends Module implements RequiresPackage
      * @param mixed  $value Optional. If specified, also checks the key has this
      * value. Booleans will be converted to 1 and 0 (even inside arrays)
      */
-    private function checkKeyExists(string $key, $value, bool $throwException = false): bool
+    private function checkKeyExists(string $key, $value): bool
     {
         $type = $this->driver->type($key);
 
@@ -679,17 +691,10 @@ class Redis extends Module implements RequiresPackage
                 );
         }
 
-        if ($throwException && !$result) {
+        if (!$result) {
             $comparatorFactory = new ComparatorFactory();
             $comparator = $comparatorFactory->getComparatorFor($value, $reply);
-            try {
-                $comparator->assertEquals($value, $reply);
-            } catch (ComparisonFailure $failure) {
-                throw new ExpectationFailedException(
-                    sprintf("Value of key \"%s\" does not match expected value", $key),
-                    $failure
-                );
-            }
+            $comparator->assertEquals($value, $reply);
         }
 
         return $result;
