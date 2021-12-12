@@ -695,6 +695,20 @@ class Redis extends Module implements RequiresPackage
             $comparatorFactory = new ComparatorFactory();
             $comparator = $comparatorFactory->getComparatorFor($value, $reply);
             $comparator->assertEquals($value, $reply);
+
+            if ($type == 'zset') {
+                /**
+                 * ArrayComparator considers out of order assoc arrays as equal
+                 * So we have to compare them as strings
+                 */
+                $replyAsString = var_export($reply, true);
+                $valueAsString = var_export($value, true);
+                $comparator = $comparatorFactory->getComparatorFor($valueAsString, $replyAsString);
+                $comparator->assertEquals($valueAsString, $replyAsString);
+            }
+            // If comparator things that values are equal, then we trust it
+            // This shouldn't happen in practice.
+            return true;
         }
 
         return $result;
