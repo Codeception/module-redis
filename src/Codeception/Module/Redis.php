@@ -60,9 +60,9 @@ class Redis extends Module implements RequiresPackage
      *
      * No default value is set for the database, using this parameter.
      *
-     * @var array
+     * @var array>string, mixed>
      */
-    protected $config = [
+    protected array $config = [
         'host'          => '127.0.0.1',
         'port'          => 6379,
         'cleanupBefore' => 'never'
@@ -73,7 +73,7 @@ class Redis extends Module implements RequiresPackage
      *
      * @var string[]
      */
-    protected $requiredFields = [
+    protected array $requiredFields = [
         'database'
     ];
 
@@ -82,6 +82,9 @@ class Redis extends Module implements RequiresPackage
      */
     public ?RedisDriver $driver = null;
 
+    /**
+     * @return array<string, string>
+     */
     public function _requires(): array
     {
         return [\Predis\Client::class => '"predis/predis": "^1.0"'];
@@ -92,7 +95,7 @@ class Redis extends Module implements RequiresPackage
      *
      * @throws ModuleException
      */
-    public function _initialize()
+    public function _initialize(): void
     {
         try {
             $this->driver = new RedisDriver($this->config);
@@ -107,9 +110,9 @@ class Redis extends Module implements RequiresPackage
     /**
      * Code to run before each suite
      *
-     * @param array $settings
+     * @param array<string, mixed> $settings
      */
-    public function _beforeSuite($settings = [])
+    public function _beforeSuite($settings = []): void
     {
         if ($this->config['cleanupBefore'] === 'suite') {
             $this->cleanup();
@@ -119,7 +122,7 @@ class Redis extends Module implements RequiresPackage
     /**
      * Code to run before each test
      */
-    public function _before(TestInterface $test)
+    public function _before(TestInterface $test): void
     {
         if ($this->config['cleanupBefore'] === 'test') {
             $this->cleanup();
@@ -181,11 +184,9 @@ class Redis extends Module implements RequiresPackage
      *
      * @param string $key The key name
      *
-     * @return array|string|null
-     *
      * @throws ModuleException if the key does not exist
      */
-    public function grabFromRedis(string $key)
+    public function grabFromRedis(string $key): array|string|null
     {
         $args = func_get_args();
 
@@ -280,7 +281,7 @@ class Redis extends Module implements RequiresPackage
      *
      * @throws ModuleException
      */
-    public function haveInRedis(string $type, string $key, $value): void
+    public function haveInRedis(string $type, string $key, mixed $value): void
     {
         switch (strtolower($type)) {
             case 'string':
@@ -364,7 +365,7 @@ class Redis extends Module implements RequiresPackage
      * @param mixed  $value Optional. If specified, also checks the key has this
      * value. Booleans will be converted to 1 and 0 (even inside arrays)
      */
-    public function dontSeeInRedis(string $key, $value = null): void
+    public function dontSeeInRedis(string $key, mixed $value = null): void
     {
         try {
             $this->assertFalse(
@@ -408,10 +409,10 @@ class Redis extends Module implements RequiresPackage
      *
      * @param string $key       The key
      * @param mixed  $item      The item
-     * @param null   $itemValue Optional and only used for zsets and hashes. If
+     * @param mixed  $itemValue Optional and only used for zsets and hashes. If
      * specified, the method will also check that the $item has this value/score
      */
-    public function dontSeeRedisKeyContains(string $key, $item, $itemValue = null): void
+    public function dontSeeRedisKeyContains(string $key, mixed $item, mixed $itemValue = null): void
     {
         $this->assertFalse(
             $this->checkKeyContains($key, $item, $itemValue),
@@ -453,7 +454,7 @@ class Redis extends Module implements RequiresPackage
      * @param mixed  $value Optional. If specified, also checks the key has this
      * value. Booleans will be converted to 1 and 0 (even inside arrays)
      */
-    public function seeInRedis(string $key, $value = null): void
+    public function seeInRedis(string $key, mixed $value = null): void
     {
         try {
             $this->assertTrue(
@@ -487,7 +488,7 @@ class Redis extends Module implements RequiresPackage
      * @param string $command The command name
      * @return mixed
      */
-    public function sendCommandToRedis(string $command)
+    public function sendCommandToRedis(string $command): mixed
     {
         return call_user_func_array(
             [$this->driver, $command],
@@ -526,10 +527,10 @@ class Redis extends Module implements RequiresPackage
      *
      * @param string $key       The key
      * @param mixed  $item      The item
-     * @param null   $itemValue Optional and only used for zsets and hashes. If
+     * @param mixed  $itemValue Optional and only used for zsets and hashes. If
      * specified, the method will also check that the $item has this value/score
      */
-    public function seeRedisKeyContains(string $key, $item, $itemValue = null): void
+    public function seeRedisKeyContains(string $key, mixed $item, mixed $itemValue = null): void
     {
         $this->assertTrue(
             $this->checkKeyContains($key, $item, $itemValue),
@@ -543,11 +544,8 @@ class Redis extends Module implements RequiresPackage
 
     /**
      * Converts boolean values to "0" and "1"
-     *
-     * @param mixed $var The variable
-     * @return mixed
      */
-    private function boolToString($var)
+    private function boolToString(mixed $var): mixed
     {
         $copy = is_array($var) ? $var : [$var];
 
@@ -565,13 +563,12 @@ class Redis extends Module implements RequiresPackage
      *
      * @param string $key       The key
      * @param mixed  $item      The item
-     * @param null   $itemValue Optional and only used for zsets and hashes. If
+     * @param mixed   $itemValue Optional and only used for zsets and hashes. If
      * specified, the method will also check that the $item has this value/score
      *
-     * @return bool
      * @throws ModuleException
      */
-    private function checkKeyContains(string $key, $item, $itemValue = null): bool
+    private function checkKeyContains(string $key, mixed $item, mixed $itemValue = null): bool
     {
         $result = null;
 
@@ -635,7 +632,7 @@ class Redis extends Module implements RequiresPackage
      * @param mixed  $value Optional. If specified, also checks the key has this
      * value. Booleans will be converted to 1 and 0 (even inside arrays)
      */
-    private function checkKeyExists(string $key, $value): bool
+    private function checkKeyExists(string $key, mixed $value): bool
     {
         $type = $this->driver->type($key);
 
@@ -718,8 +715,6 @@ class Redis extends Module implements RequiresPackage
      * Explicitly cast the scores of a Zset associative array as float/double
      *
      * @param array $arr The ZSet associative array
-     *
-     * @return array
      */
     private function scoresToFloat(array $arr): array
     {
