@@ -13,11 +13,11 @@
 			"name": "Dmitriy Maltsev"
 		}
 	],
-	"minimum-stability": "dev",
+	"minimum-stability": "beta",
 	"require": {
 		"php": "^8.0",
-		"codeception/codeception": "^5.0.0-alpha2",
-		"predis/predis": "^1.1",
+		"codeception/codeception": "^5.0",
+		"predis/predis": "^1.1 | ^2.0",
 		"sebastian/comparator": "^4.0 | ^5.0"
 	},
 	"autoload": {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Codeception\Module;
 
-use Codeception\Lib\Interfaces\RequiresPackage;
 use Codeception\Module;
 use Codeception\Exception\ModuleException;
 use Codeception\TestInterface;
@@ -53,7 +52,7 @@ use SebastianBergmann\Comparator\Factory as ComparatorFactory;
  *
  * @author Marc Verney <marc@marcverney.net>
  */
-class Redis extends Module implements RequiresPackage
+class Redis extends Module
 {
     /**
      * {@inheritdoc}
@@ -81,14 +80,6 @@ class Redis extends Module implements RequiresPackage
      * The Redis driver
      */
     public ?RedisDriver $driver = null;
-
-    /**
-     * @return array<string, string>
-     */
-    public function _requires(): array
-    {
-        return [\Predis\Client::class => '"predis/predis": "^1.0"'];
-    }
 
     /**
      * Instructions to run after configuration is loaded
